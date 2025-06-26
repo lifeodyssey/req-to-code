@@ -1,0 +1,151 @@
+name: AI Code Generation
+
+on:
+  push:
+    paths: 
+      - 'requirements/*.md'
+    branches:
+      - main
+      - develop
+
+jobs:
+  generate-code:
+    name: Generate Code with AI
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pull-requests: write
+      
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install Gemini CLI
+        run: |
+          npm install -g @google/gemini-cli
+          gemini --version
+          
+      - name: Validate Environment
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "❌ GEMINI_API_KEY not found in secrets"
+            exit 1
+          fi
+          echo "✅ Environment validation passed"
+          
+      - name: Process Requirements
+        id: process
+        run: |
+          # Find the most recently changed requirement file
+          REQUIREMENT_FILE=$(find requirements -name "*.md" -type f -not -name ".gitkeep" | head -1)
+          
+          if [ -z "$REQUIREMENT_FILE" ]; then
+            echo "❌ No requirement file found"
+            exit 1
+          fi
+          
+          echo "📄 Processing: $REQUIREMENT_FILE"
+          echo "requirement_file=$REQUIREMENT_FILE" >> $GITHUB_OUTPUT
+          
+          # Extract feature name for branch naming
+          FEATURE_NAME=$(basename "$REQUIREMENT_FILE" .md)
+          TIMESTAMP=$(date +%Y%m%d-%H%M%S)
+          BRANCH_NAME="ai-generated/${FEATURE_NAME}-${TIMESTAMP}"
+          
+          echo "🌿 Branch name: $BRANCH_NAME"
+          echo "branch_name=$BRANCH_NAME" >> $GITHUB_OUTPUT
+          echo "feature_name=$FEATURE_NAME" >> $GITHUB_OUTPUT
+          
+      - name: Generate Code
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          REQUIREMENT_CONTENT=$(cat "${{ steps.process.outputs.requirement_file }}")
+          
+          echo "🤖 Generating code with Gemini CLI..."
+          
+          # Create output directory
+          mkdir -p generated
+          
+          # Generate code using Gemini CLI
+          gemini -p "Generate code based on this requirement:
+          
+          $REQUIREMENT_CONTENT
+          
+          Rules:
+          - Output only the code, no explanations
+          - Use appropriate file extension based on technology mentioned
+          - Include basic error handling
+          - Add minimal comments for clarity
+          - Follow standard coding conventions" > generated/${{ steps.process.outputs.feature_name }}.js
+          
+          echo "✅ Code generation completed"
+          
+      - name: Create Branch and Commit
+        run: |
+          # Configure Git
+          git config user.name "AI Code Generator"
+          git config user.email "ai-bot@github-actions.com"
+          
+          # Create and switch to new branch
+          git checkout -b "${{ steps.process.outputs.branch_name }}"
+          
+          # Add generated files
+          git add generated/
+          
+          # Commit with descriptive message
+          git commit -m "🤖 AI Generated: ${{ steps.process.outputs.feature_name }}
+
+          Generated from: ${{ steps.process.outputs.requirement_file }}
+          Timestamp: $(date)
+          Workflow: ${{ github.workflow }}
+          Run ID: ${{ github.run_id }}"
+          
+          # Push branch
+          git push origin "${{ steps.process.outputs.branch_name }}"
+          
+      - name: Create Pull Request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Create PR with GitHub CLI
+          gh pr create \
+            --title "🤖 AI Generated: ${{ steps.process.outputs.feature_name }}" \
+            --body "## AI Generated Code
+
+          **Source Requirement**: \`${{ steps.process.outputs.requirement_file }}\`
+          **Generated Files**: \`generated/${{ steps.process.outputs.feature_name }}.js\`
+          **Workflow Run**: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+
+          ### Review Checklist
+          - [ ] Code meets functional requirements
+          - [ ] Code follows project conventions
+          - [ ] No security vulnerabilities
+          - [ ] Ready for integration
+
+          ---
+          *This PR was automatically created by AI Code Generation workflow*" \
+            --head "${{ steps.process.outputs.branch_name }}" \
+            --base main \
+            --label "ai-generated" \
+            --label "needs-review"
+            
+      - name: Workflow Summary
+        run: |
+          echo "## 🎉 Workflow Completed Successfully" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Requirement**: ${{ steps.process.outputs.requirement_file }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Generated**: generated/${{ steps.process.outputs.feature_name }}.js" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ steps.process.outputs.branch_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **PR**: Created automatically" >> $GITHUB_STEP_SUMMARY
