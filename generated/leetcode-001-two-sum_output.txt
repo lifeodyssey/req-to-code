@@ -1,0 +1,47 @@
+[INFO] Your configured model (gemini-2.5-pro) was temporarily unavailable. Switched to gemini-2.5-flash for this session.
+Attempt 1 failed with status 429. Retrying with backoff... ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Resource has been exhausted (e.g. check quota).\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n","code":429,"status":"Too Many Requests"}}
+    at throwErrorIfNotOK (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:13101:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:12892:13
+    at async Models.generateContentStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:14217:24)
+    at async retryWithBackoff (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:61:20)
+    at async GeminiChat.sendMessageStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:287:36)
+    at async runNonInteractive (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:43:36)
+    at async main (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:149:5) {
+  status: 429
+}
+Attempt 2 failed with status 429. Retrying with backoff... ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Resource has been exhausted (e.g. check quota).\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n","code":429,"status":"Too Many Requests"}}
+    at throwErrorIfNotOK (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:13101:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:12892:13
+    at async Models.generateContentStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:14217:24)
+    at async retryWithBackoff (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:61:20)
+    at async GeminiChat.sendMessageStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:287:36)
+    at async runNonInteractive (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:43:36)
+    at async main (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:149:5) {
+  status: 429
+}
+Attempt 3 failed with status 429. Retrying with backoff... ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Resource has been exhausted (e.g. check quota).\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n","code":429,"status":"Too Many Requests"}}
+    at throwErrorIfNotOK (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:13101:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:12892:13
+    at async Models.generateContentStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:14217:24)
+    at async retryWithBackoff (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:61:20)
+    at async GeminiChat.sendMessageStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:287:36)
+    at async runNonInteractive (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:43:36)
+    at async main (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:149:5) {
+  status: 429
+}
+Attempt 4 failed with status 429. Retrying with backoff... ApiError: {"error":{"message":"{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Resource has been exhausted (e.g. check quota).\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n","code":429,"status":"Too Many Requests"}}
+    at throwErrorIfNotOK (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:13101:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:12892:13
+    at async Models.generateContentStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/genai/dist/node/index.mjs:14217:24)
+    at async retryWithBackoff (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/utils/retry.js:61:20)
+    at async GeminiChat.sendMessageStream (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/node_modules/@google/gemini-cli-core/dist/src/core/geminiChat.js:287:36)
+    at async runNonInteractive (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/nonInteractiveCli.js:43:36)
+    at async main (file:///opt/hostedtoolcache/node/18.20.8/x64/lib/node_modules/@google/gemini-cli/dist/src/gemini.js:149:5) {
+  status: 429
+}
+[API Error: {"error":{"message":"{\n  \"error\": {\n    \"code\": 429,\n    \"message\": \"Resource has been exhausted (e.g. check quota).\",\n    \"status\": \"RESOURCE_EXHAUSTED\"\n  }\n}\n","code":429,"status":"Too Many Requests"}}]
+Please wait and try again later. To increase your limits, request a quota increase through AI Studio, or switch to another /auth method
