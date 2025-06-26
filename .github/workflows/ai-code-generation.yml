@@ -296,11 +296,26 @@ jobs:
           # Check if there are any files to commit
           if [ -d "generated" ] && [ "$(ls -A generated 2>/dev/null)" ]; then
             echo "📁 Adding generated files..."
-            git add generated/
+            echo "📋 Files in generated directory:"
+            ls -la generated/
+
+            echo "🔍 Git status before adding:"
+            git status --porcelain
+
+            git add generated/ --force
+
+            echo "🔍 Git status after adding:"
+            git status --porcelain
+            echo "🔍 Git diff --cached:"
+            git diff --cached --name-only
 
             # Check if there are actually changes to commit
             if git diff --cached --quiet; then
-              echo "⚠️ No changes to commit"
+              echo "⚠️ No changes to commit - files may already exist"
+              echo "📄 Checking git status:"
+              git status
+              echo "📄 Checking generated files content:"
+              find generated/ -type f -exec echo "=== {} ===" \; -exec head -10 {} \;
               exit 0
             fi
 
@@ -359,7 +374,7 @@ jobs:
             --base main \
             --label "ai-generated" \
             --label "needs-review" \
-            --label "todo-task-03"
+            --label "enhancement"
 
       # TODO: Task 03 - Implement Error Handling
       # This step handles failures in code generation

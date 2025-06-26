@@ -6,9 +6,14 @@ npm-debug.log*
 .env
 .env.local
 
-# Generated files
-generated/*
+# Generated files (allow code files for review)
+generated/*.txt
+generated/*.log
 !generated/.gitkeep
+!generated/*.js
+!generated/*.py
+!generated/*.java
+!generated/*.ts
 
 # IDE
 .vscode/
