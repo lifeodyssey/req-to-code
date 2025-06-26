@@ -2,11 +2,17 @@ name: AI Code Generation
 
 on:
   push:
-    paths: 
+    paths:
       - 'requirements/*.md'
     branches:
       - main
       - develop
+  workflow_dispatch:
+    inputs:
+      requirement_file:
+        description: 'Requirement file to process (optional, will auto-detect if not provided)'
+        required: false
+        type: string
 
 jobs:
   generate-code:
@@ -80,11 +86,18 @@ jobs:
       - name: Process Requirements
         id: process
         run: |
-          # Find the most recently changed requirement file
-          REQUIREMENT_FILE=$(find requirements -name "*.md" -type f -not -name ".gitkeep" | head -1)
-          
-          if [ -z "$REQUIREMENT_FILE" ]; then
-            echo "❌ No requirement file found"
+          # Check if requirement file was provided via workflow_dispatch
+          if [ -n "${{ github.event.inputs.requirement_file }}" ]; then
+            REQUIREMENT_FILE="${{ github.event.inputs.requirement_file }}"
+            echo "📄 Using manually specified file: $REQUIREMENT_FILE"
+          else
+            # Find the most recently changed requirement file
+            REQUIREMENT_FILE=$(find requirements -name "*.md" -type f -not -name ".gitkeep" | head -1)
+            echo "📄 Auto-detected file: $REQUIREMENT_FILE"
+          fi
+
+          if [ -z "$REQUIREMENT_FILE" ] || [ ! -f "$REQUIREMENT_FILE" ]; then
+            echo "❌ No valid requirement file found"
             exit 1
           fi
           

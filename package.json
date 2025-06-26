@@ -1,0 +1,28 @@
+{
+  "name": "req-to-code",
+  "version": "1.0.0",
+  "description": "AI-powered code generation from requirements using Gemini CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lifeodyssey/req-to-code.git"
+  },
+  "keywords": [
+    "ai",
+    "code-generation",
+    "gemini",
+    "automation",
+    "github-actions"
+  ],
+  "author": "Zhenjia ZHOU",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lifeodyssey/req-to-code/issues"
+  },
+  "homepage": "https://github.com/lifeodyssey/req-to-code#readme",
+  "devDependencies": {},
+  "dependencies": {}
+}
