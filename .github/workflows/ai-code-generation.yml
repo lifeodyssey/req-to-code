@@ -50,7 +50,6 @@ jobs:
           cat > .gemini/settings.json << EOF
           {
             "selectedAuthType": "USE_GEMINI",
-            "approvalMode": "YOLO",
             "excludeTools": [],
             "autoConfigureMaxOldSpaceSize": true
           }
@@ -134,12 +133,30 @@ jobs:
           # The CLI will automatically detect it's in a non-TTY environment
           echo "🤖 Generating code with Gemini CLI..."
 
-          # Method 1: Using stdin (recommended)
-          echo "$REQUIREMENT_CONTENT" | gemini > "generated/${FEATURE_NAME}_output.txt" 2>&1
+          # Create a more specific prompt for code generation
+          PROMPT="You are a code generation assistant. Based on the following requirement, you must create actual JavaScript files using the write_file tool.
+
+          REQUIREMENT:
+          $REQUIREMENT_CONTENT
+
+          INSTRUCTIONS:
+          1. Use the write_file tool to create a JavaScript file named '${FEATURE_NAME}.js'
+          2. Implement the solution with proper JSDoc comments
+          3. Export the function for use in other modules
+          4. Follow modern ES6+ syntax
+          5. Include comprehensive error handling
+          6. Add unit tests if appropriate
+
+          You MUST use the write_file tool to create actual files. Do not just provide code examples."
+
+          # Method 1: Using stdin with enhanced prompt and YOLO mode
+          echo "$PROMPT" | gemini --yolo > "generated/${FEATURE_NAME}_output.txt" 2>&1
 
           # Check if generation was successful
           if [ $? -eq 0 ]; then
             echo "✅ Code generation completed successfully"
+            echo "📄 Gemini CLI output:"
+            head -20 "generated/${FEATURE_NAME}_output.txt"
           else
             echo "❌ Code generation failed"
             cat "generated/${FEATURE_NAME}_output.txt"
@@ -185,10 +202,38 @@ jobs:
             echo "has_generated_files=true" >> $GITHUB_OUTPUT
             echo "generated_count=$(ls generated/ | wc -l)" >> $GITHUB_OUTPUT
           else
-            echo "⚠️ No generated files found"
-            echo "� Checking Gemini CLI output:"
-            cat "generated/${{ steps.generate.outputs.feature_name }}_output.txt" || echo "No output file found"
-            echo "has_generated_files=false" >> $GITHUB_OUTPUT
+            echo "⚠️ No generated files found in workspace"
+            echo "� Checking Gemini CLI output for code content..."
+
+            # Check if the output contains code that we can extract
+            OUTPUT_FILE="generated/${{ steps.generate.outputs.feature_name }}_output.txt"
+            if [ -f "$OUTPUT_FILE" ]; then
+              echo "📋 Gemini CLI output content:"
+              cat "$OUTPUT_FILE"
+
+              # Try to extract JavaScript code from the output
+              if grep -q "function\|const\|let\|var\|=>" "$OUTPUT_FILE"; then
+                echo "🔍 Found code in output, extracting..."
+
+                # Extract code blocks (simple heuristic)
+                sed -n '/```javascript/,/```/p' "$OUTPUT_FILE" | sed '1d;$d' > "generated/${{ steps.generate.outputs.feature_name }}.js" 2>/dev/null || true
+
+                # If no code blocks found, try to extract the whole output as code
+                if [ ! -s "generated/${{ steps.generate.outputs.feature_name }}.js" ]; then
+                  cp "$OUTPUT_FILE" "generated/${{ steps.generate.outputs.feature_name }}.js"
+                fi
+
+                echo "✅ Extracted code to generated/${{ steps.generate.outputs.feature_name }}.js"
+                echo "has_generated_files=true" >> $GITHUB_OUTPUT
+                echo "generated_count=1" >> $GITHUB_OUTPUT
+              else
+                echo "❌ No code content found in output"
+                echo "has_generated_files=false" >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "❌ No output file found"
+              echo "has_generated_files=false" >> $GITHUB_OUTPUT
+            fi
           fi
 
       - name: Handle Generation Errors
@@ -240,23 +285,39 @@ jobs:
           # Configure Git
           git config user.name "AI Code Generator"
           git config user.email "ai-bot@github-actions.com"
-          
+
           # Create and switch to new branch
           git checkout -b "${{ steps.process.outputs.branch_name }}"
-          
-          # Add generated files
-          git add generated/
-          
-          # Commit with descriptive message
-          git commit -m "🤖 AI Generated: ${{ steps.process.outputs.feature_name }}
+
+          # Check if there are any files to commit
+          if [ -d "generated" ] && [ "$(ls -A generated 2>/dev/null)" ]; then
+            echo "📁 Adding generated files..."
+            git add generated/
+
+            # Check if there are actually changes to commit
+            if git diff --cached --quiet; then
+              echo "⚠️ No changes to commit"
+              exit 0
+            fi
+
+            # Commit with descriptive message
+            git commit -m "🤖 AI Generated: ${{ steps.process.outputs.feature_name }}
 
           Generated from: ${{ steps.process.outputs.requirement_file }}
           Timestamp: $(date)
           Workflow: ${{ github.workflow }}
           Run ID: ${{ github.run_id }}"
-          
-          # Push branch
-          git push origin "${{ steps.process.outputs.branch_name }}"
+
+            # Push branch
+            git push origin "${{ steps.process.outputs.branch_name }}"
+
+            echo "✅ Successfully pushed generated code to branch: ${{ steps.process.outputs.branch_name }}"
+          else
+            echo "❌ No generated files found to commit"
+            echo "📄 Gemini CLI output was:"
+            cat "generated/${{ steps.process.outputs.feature_name }}_output.txt" 2>/dev/null || echo "No output file found"
+            exit 1
+          fi
           
       - name: Create Pull Request
         if: steps.files.outputs.has_generated_files == 'true'
