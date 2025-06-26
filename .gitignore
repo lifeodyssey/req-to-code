@@ -32,5 +32,6 @@ temp/
 test-results.md
 test-requirements/
 
-#gemini cli
+# Gemini CLI
 /gemini-cli
+.gemini/
