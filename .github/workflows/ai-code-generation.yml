@@ -49,7 +49,7 @@ jobs:
           # Create settings.json for non-interactive mode
           cat > .gemini/settings.json << EOF
           {
-            "selectedAuthType": "USE_GEMINI",
+            "selectedAuthType": "gemini-api-key",
             "excludeTools": [],
             "autoConfigureMaxOldSpaceSize": true
           }
@@ -125,6 +125,10 @@ jobs:
 
           echo "📝 Processing requirement: $FEATURE_NAME"
           echo "📄 Requirement file: ${{ steps.process.outputs.requirement_file }}"
+
+          # Debug: Check environment variables
+          echo "🔍 Debug: API key present: $([[ -n "$GEMINI_API_KEY" ]] && echo 'Yes' || echo 'No')"
+          echo "🔍 Debug: API key format: $([[ "$GEMINI_API_KEY" =~ ^AIza.* ]] && echo 'Valid' || echo 'Invalid')"
 
           # Create output directory
           mkdir -p generated
